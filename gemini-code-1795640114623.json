@@ -1,0 +1,13 @@
+{
+  "name": "egg-shockers-multiplayer",
+  "version": "1.0.0",
+  "description": "Multiplayer 3D Egg Shooter with Room Codes for Render",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
