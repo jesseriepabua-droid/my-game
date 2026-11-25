@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shell Shockers 3D — Multiplayer Arena</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- LOBBY OVERLAY -->
+  <div id="lobby">
+    <div class="lobby-container">
+      <div class="lobby-header">
+        <h1>SHELL SHOCKERS 3D</h1>
+        <p class="subtitle">Multi-Arena 3D Egg Combat • Real-Time Multiplayer</p>
+      </div>
+
+      <div class="lobby-grid">
+        <!-- LEFT COLUMN: LOADOUT -->
+        <div class="panel">
+          <h3>1. Egg & Weapon Loadout</h3>
+          <div class="input-group">
+            <label>Nickname</label>
+            <input type="text" id="playerName" placeholder="Enter nickname..." maxlength="14" value="EggWarrior" />
+          </div>
+
+          <div class="input-group">
+            <label>Shell Color</label>
+            <div class="color-picker" id="colorPicker">
+              <button class="color-btn active" data-color="#ff5252" style="background:#ff5252"></button>
+              <button class="color-btn" data-color="#448aff" style="background:#448aff"></button>
+              <button class="color-btn" data-color="#69f0ae" style="background:#69f0ae"></button>
+              <button class="color-btn" data-color="#ffd740" style="background:#ffd740"></button>
+              <button class="color-btn" data-color="#e040fb" style="background:#e040fb"></button>
+              <button class="color-btn" data-color="#ff6e40" style="background:#ff6e40"></button>
+              <button class="color-btn" data-color="#ffffff" style="background:#ffffff"></button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Primary Weapon Class</label>
+            <div class="weapon-grid" id="weaponGrid">
+              <button class="weapon-btn active" data-weapon="eggk47">
+                <strong>EggK-47</strong>
+                <span>Auto Rifle • Balanced</span>
+              </button>
+              <button class="weapon-btn" data-weapon="scrambler">
+                <strong>Scrambler</strong>
+                <span>Shotgun • Close Blast</span>
+              </button>
+              <button class="weapon-btn" data-weapon="freeranger">
+                <strong>Free Ranger</strong>
+                <span>Semi-Auto Sniper • Scope</span>
+              </button>
+              <button class="weapon-btn" data-weapon="rpegg">
+                <strong>RPEGG</strong>
+                <span>Rocket • Splash Damage</span>
+              </button>
+              <button class="weapon-btn" data-weapon="whipper">
+                <strong>Whipper</strong>
+                <span>Rapid SMG • 40 Mag</span>
+              </button>
+              <button class="weapon-btn" data-weapon="crackshot">
+                <strong>Crackshot</strong>
+                <span>Bolt Sniper • 1-Hit Kill</span>
+              </button>
+              <button class="weapon-btn" data-weapon="trihard">
+                <strong>Tri-Hard</strong>
+                <span>3-Round Burst Rifle</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: HOST OR JOIN -->
+        <div class="panel">
+          <h3>2. Host Arena or Join Room</h3>
+
+          <div class="input-group">
+            <label>Select Arena Map (10 Maps)</label>
+            <select id="mapSelect">
+              <option value="castle">1. Castle (Towers & Courtyard)</option>
+              <option value="blue">2. Blue (Multi-Tier Catwalks)</option>
+              <option value="dirt">3. Dirt (Canyon & Bunkers)</option>
+              <option value="fortflip">4. Fort Flip (Twin Fortresses)</option>
+              <option value="moonbase">5. Moonbase (Low-Gravity Sci-Fi)</option>
+              <option value="ruins">6. Ruins (Ancient Temple Pillars)</option>
+              <option value="shipyard">7. Shipyard (Cargo Containers)</option>
+              <option value="shellville">8. Shellville (Town Square & Roofs)</option>
+              <option value="twotowers">9. Two Towers (Sniper Bridges)</option>
+              <option value="bastion">10. Bastion (Central Citadel)</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Match Duration</label>
+            <div class="time-picker" id="timePicker">
+              <button class="time-btn active" data-time="180">3 Mins</button>
+              <button class="time-btn" data-time="300">5 Mins</button>
+              <button class="time-btn" data-time="480">8 Mins</button>
+            </div>
+          </div>
+
+          <button id="createBtn" class="btn primary">HOST NEW MATCH</button>
+
+          <div class="divider"><span>OR JOIN FRIEND'S CODE</span></div>
+
+          <div class="join-row">
+            <input type="text" id="roomCodeInput" placeholder="CODE" maxlength="4" />
+            <button id="joinBtn" class="btn secondary">JOIN ROOM</button>
+          </div>
+
+          <p id="errorMsg" class="error"></p>
+
+          <div class="controls-box">
+            <b>Controls:</b> <span>WASD</span> Move • <span>SPACE</span> Jump • <span>Left Click</span> Shoot • <span>Right Click</span> Scope • <span>R</span> Reload • <span>1-7 / B</span> Switch Gun
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SNIPER SCOPE OVERLAY -->
+  <div id="scopeOverlay" class="hidden">
+    <div class="scope-circle">
+      <div class="scope-line-h"></div>
+      <div class="scope-line-v"></div>
+    </div>
+  </div>
+
+  <!-- HITMARKER & DAMAGE FLASH -->
+  <div id="hitmarker" class="hidden">✕</div>
+  <div id="damageFlash"></div>
+
+  <!-- IN-GAME HUD -->
+  <div id="hud" class="hidden">
+    <div class="top-bar">
+      <div class="room-info">
+        <div class="room-badge">
+          CODE: <span id="displayRoomCode">----</span>
+          <button id="copyCodeBtn">Copy</button>
+        </div>
+        <div class="map-badge" id="displayMapName">MAP: CASTLE</div>
+      </div>
+
+      <div class="timer-box" id="timerDisplay">03:00</div>
+
+      <div class="scoreboard">
+        <div class="score-header">LIVE RANKINGS</div>
+        <div id="scoreboardList"></div>
+      </div>
+    </div>
+
+    <div id="killFeed"></div>
+    <div id="crosshair">+</div>
+    <div id="clickPrompt">Click screen to lock aim • Press <b>B</b> to change weapon</div>
+
+    <!-- QUICK WEAPON SWITCHER BAR -->
+    <div id="quickWeaponBar" class="hidden">
+      <div class="qw-title">Switch Weapon (Press 1-7 or B to close)</div>
+      <div class="qw-list" id="qwList"></div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="hp-container">
+        <span>SHELL HP</span>
+        <div class="hp-bar-bg"><div id="hpBar" class="hp-bar-fill"></div></div>
+        <span id="hpText">100</span>
+      </div>
+
+      <div class="weapon-hud">
+        <span id="currentWeaponName">EggK-47</span>
+        <span class="ammo-divider">|</span>
+        <span id="ammoText">30 / 30</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- END OF MATCH WINNER & RANKING PODIUM -->
+  <div id="matchOverModal" class="hidden">
+    <div class="winner-card">
+      <div class="trophy">👑</div>
+      <div class="winner-label">MATCH CHAMPION</div>
+      <h1 id="winnerNameFlash" class="winner-flash">EGGWARRIOR</h1>
+      <div id="finalStandings" class="standings-table"></div>
+      <p class="subtitle">Next round on this arena starts automatically in 10 seconds...</p>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
