@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EGG SHOCKERS 3D — 10 Complex Destructible 3D Maps</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <!-- MAIN MENU -->
+  <div id="menuScreen" class="overlay">
+    <div class="card hero-card">
+      <div class="badge">10 COMPLEX MULTI-FLOOR 3D MAPS • DESTRUCTIBLE COVER • OFFLINE + GAME CODE</div>
+      <h1>🥚 EGG SHOCKERS 3D</h1>
+      <p class="subtitle">Multi-Story Houses, Ladders, Bridges, Forests, Bunkers & Destructible Barriers — 7 Weapons + Offline Bots & P2P Game Code</p>
+
+      <div class="form-row-4">
+        <div class="form-group">
+          <label for="playerName">Egg Callsign</label>
+          <input id="playerName" type="text" maxlength="14" placeholder="Enter your name..." value="YolkSniper" />
+        </div>
+        <div class="form-group">
+          <label for="mapSelect">Select 3D Arena Map (10 Maps)</label>
+          <select id="mapSelect">
+            <option value="coop">1. Blue Barn Coop (2-Story Barn & Orchard)</option>
+            <option value="fort">2. Fort Flip (Twin Castles & Sky-Bridge)</option>
+            <option value="village">3. Clucktown Village (Houses & Plaza)</option>
+            <option value="forest">4. Shellwood Forest (Pine Woods & Towers)</option>
+            <option value="shipyard">5. Rust Shipyard (3-High Containers)</option>
+            <option value="ruins">6. Overgrown Ruins (4-Tier Ziggurat)</option>
+            <option value="moonbase">7. Lunar Moonbase (Low-Gravity Domes)</option>
+            <option value="canyon">8. Red Rock Canyon (Mesa Bridges)</option>
+            <option value="facility">9. Cryo Lab Facility (Glass Pods & Vents)</option>
+            <option value="arena">10. Eggosseum Colosseum (3-Tier Balconies)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="timeLimitSelect">Match Timer</label>
+          <select id="timeLimitSelect">
+            <option value="180" selected>3 Minutes</option>
+            <option value="240">4 Minutes</option>
+            <option value="300">5 Minutes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="botCountSelect">AI Egg Bots</label>
+          <select id="botCountSelect">
+            <option value="5">5 AI Eggs</option>
+            <option value="7" selected>7 AI Eggs</option>
+            <option value="3">3 AI Eggs</option>
+            <option value="0">0 Bots (Friends)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Choose Your Shell Shockers Class (7 Weapons)</label>
+        <div class="class-grid" id="classSelector">
+          <button class="class-card selected" data-cls="eggk47">
+            <strong>1. EggK-47 (Soldier)</strong>
+            <span>Full-Auto Assault Rifle • Balanced Range & RoF</span>
+          </button>
+          <button class="class-card" data-cls="scrambler">
+            <strong>2. Dozen Gauge (Scrambler)</strong>
+            <span>Heavy Pump Shotgun • Breaches Walls & Close Blasts</span>
+          </button>
+          <button class="class-card" data-cls="freeRanger">
+            <strong>3. CSG-1 (Free Ranger)</strong>
+            <span>Semi-Auto Sniper Rifle • Right-Click Scope Zoom</span>
+          </button>
+          <button class="class-card" data-cls="rpegg">
+            <strong>4. RPEGG (Eggsploder)</strong>
+            <span>Rocket Launcher • Demolishes Cover & Bunkers</span>
+          </button>
+          <button class="class-card" data-cls="whipper">
+            <strong>5. SMEGG (Whipper)</strong>
+            <span>High-RPM Submachine Gun • Rapid Shredder</span>
+          </button>
+          <button class="class-card" data-cls="crackshot">
+            <strong>6. M24 Crackshot</strong>
+            <span>Bolt-Action Heavy Sniper • One-Shot Head/Yolk Kill</span>
+          </button>
+          <button class="class-card" data-cls="triHard">
+            <strong>7. Tri-Hard (Burst)</strong>
+            <span>3-Round Burst Rifle • Pinpoint Mid-Range Accuracy</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="offlineBtn" class="btn accent">Play Offline (Instant 3D Bots)</button>
+        <button id="hostBtn" class="btn primary">Host Game Code</button>
+        <div class="join-box">
+          <input id="codeInput" type="text" maxlength="5" placeholder="CODE" />
+          <button id="joinBtn" class="btn secondary">Join Code</button>
+        </div>
+      </div>
+      <p id="menuError" class="error-text"></p>
+
+      <div class="controls-bar">
+        <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move & Climb Ladders</span>
+        <span><kbd>SPACE</kbd> Jump</span>
+        <span><kbd>L-CLICK</kbd> Fire & Destroy Cover</span>
+        <span><kbd>R-CLICK</kbd> / <kbd>SHIFT</kbd> Scope</span>
+        <span><kbd>R</kbd> Reload</span>
+        <span><kbd>Q</kbd> Egg Grenade</span>
+        <span><kbd>E</kbd> Pistol</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MULTIPLAYER LOBBY -->
+  <div id="lobbyScreen" class="overlay hidden">
+    <div class="card lobby-card">
+      <div class="lobby-header">
+        <div>
+          <span class="label-sm">GAME CODE OR 1-CLICK INVITE LINK</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="code-display" id="lobbyCode">-----</div>
+            <button id="copyInviteBtn" class="btn secondary" style="padding:10px 14px;font-size:13px;">📋 Copy Invite Link</button>
+          </div>
+          <div id="copyFeedback" class="label-sm" style="color:#34d399;margin-top:4px;min-height:14px;"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="player-count" id="lobbyCount">1 / 8 Eggs</div>
+          <div class="label-sm" id="lobbyMapLabel" style="color:#38bdf8;margin-top:4px;">MAP: BLUE BARN COOP • 3 MIN</div>
+        </div>
+      </div>
+      <div id="lobbyList" class="player-list"></div>
+      <div class="lobby-actions">
+        <button id="startNetBtn" class="btn primary hidden">START 3D FPS MATCH</button>
+        <button id="leaveLobbyBtn" class="btn secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D FPS VIEWPORT & HUD -->
+  <div id="gameContainer" class="hidden">
+    <div id="threeMount"></div>
+
+    <!-- Sniper Scope Overlay -->
+    <div id="scopeOverlay" class="scope-overlay hidden">
+      <div class="scope-ring"></div>
+      <div class="scope-line-h"></div>
+      <div class="scope-line-v"></div>
+    </div>
+
+    <!-- Center Dynamic Crosshair & Hitmarker -->
+    <div id="crosshair" class="crosshair">
+      <div class="ch-dot"></div>
+      <div id="hitmarker" class="hitmarker hidden">✕</div>
+    </div>
+
+    <!-- Damage Vignette Flash -->
+    <div id="yolkFlash" class="yolk-flash"></div>
+
+    <!-- Top Center Live Match Timer -->
+    <div class="hud-top-center">
+      <div class="timer-pill" id="hudMatchTimer">03:00</div>
+    </div>
+
+    <!-- Top Left Room / Map Tag & Leaderboard -->
+    <div class="hud-top-left">
+      <div class="room-pill" id="hudRoomTag">OFFLINE • BLUE BARN COOP</div>
+      <div class="mini-board" id="hudScoreboard"></div>
+    </div>
+
+    <!-- Top Right Kill Feed -->
+    <div class="kill-feed" id="killFeed"></div>
+
+    <!-- Bottom Left Health & Golden Eggs -->
+    <div class="hud-bottom-left">
+      <div class="egg-hp-box">
+        <div class="egg-icon" id="hudEggIcon">🥚</div>
+        <div>
+          <div class="hp-num" id="hudHp">200 HP</div>
+          <div class="hp-bar"><div id="hudHpBar" class="hp-fill" style="width:100%"></div></div>
+        </div>
+      </div>
+      <div class="golden-eggs-pill" id="hudGolden">🪙 0 GOLDEN EGGS • 🧪 POTIONS: 4 ACTIVE</div>
+    </div>
+
+    <!-- Bottom Right Weapon, Ammo & Grenades -->
+    <div class="hud-bottom-right">
+      <div class="grenade-pill" id="hudGrenades">💣 x2 [Q]</div>
+      <div class="weapon-pill">
+        <div class="wep-name" id="hudWepName">EggK-47</div>
+        <div class="ammo-num" id="hudAmmo">30 / 120</div>
+      </div>
+    </div>
+
+    <!-- Pointer Lock Prompt -->
+    <div id="lockPrompt" class="lock-prompt">
+      <div class="lock-box">
+        <h2>CLICK SCREEN TO AIM & LOCK MOUSE</h2>
+        <p>WASD Move & Climb Ladders • Space Jump • Left-Click Shoot • Right-Click/Shift Scope • R Reload • Q Grenade • E Pistol</p>
+      </div>
+    </div>
+
+    <!-- Respawn Overlay -->
+    <div id="deathOverlay" class="death-overlay hidden">
+      <div class="death-card">
+        <h2>🍳 YOU GOT SCRAMBLED!</h2>
+        <p id="killerLabel">Eliminated by Enemy</p>
+        <div class="form-group" style="margin-top:14px;">
+          <label>Switch Weapon Before Respawn:</label>
+          <select id="respawnClassSelect">
+            <option value="eggk47">EggK-47 (Soldier)</option>
+            <option value="scrambler">Dozen Gauge (Scrambler)</option>
+            <option value="freeRanger">CSG-1 (Free Ranger Sniper)</option>
+            <option value="rpegg">RPEGG (Rocket Launcher)</option>
+            <option value="whipper">SMEGG (Whipper SMG)</option>
+            <option value="crackshot">M24 Crackshot (Bolt Sniper)</option>
+            <option value="triHard">Tri-Hard (3-Burst Rifle)</option>
+          </select>
+        </div>
+        <button id="respawnBtn" class="btn primary" style="width:100%">RESPAWN NOW</button>
+      </div>
+    </div>
+
+    <!-- Final Match Winner & Full Ranking Overlay -->
+    <div id="matchOverOverlay" class="overlay hidden">
+      <div class="card podium-card">
+        <div class="badge">TIME'S UP • FINAL MATCH STANDINGS</div>
+        <h1 id="matchWinnerHeadline">🏆 #1 YOLKSNIPER WINS!</h1>
+        <p class="subtitle" id="matchWinnerSub">Most Eliminations in the Arena</p>
+
+        <div id="finalRankingsList" class="ranking-list"></div>
+
+        <div class="action-row" style="margin-top:16px;">
+          <button id="playAgainBtn" class="btn primary">Play Another Match</button>
+          <button id="returnMenuBtn" class="btn secondary">Main Menu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
